@@ -13,4 +13,9 @@ public class GiveRoleRequest {
      * Роль, которую нужно назначить пользователю.
      */
     private String role;
+
+    /*
+    *  Секретный ключ для возможности изменять роль пользователя
+    * */
+    private String secretKey;
 }

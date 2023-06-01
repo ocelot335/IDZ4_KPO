@@ -48,7 +48,7 @@ public class UserController {
     @PutMapping("/give_role")
     public ResponseEntity<String> giveRole(@RequestBody GiveRoleRequest request) {
         try {
-            userService.giveRole(request.getEmail(), request.getRole());
+            userService.giveRole(request.getEmail(), request.getRole(), request.getSecretKey());
         } catch (RoleException | RequestException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
         }
@@ -83,7 +83,7 @@ public class UserController {
         String info = null;
         try {
             info = userService.getInfo(jwt, id);
-        } catch (JWTException | RoleException exception) {
+        } catch (JWTException | RoleException | RequestException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
         }
         return ResponseEntity.ok("Информация о пользователе:\n" + info);

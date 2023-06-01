@@ -17,6 +17,7 @@ import java.util.Optional;
  */
 @Service
 public class UserService {
+    private final String secretKey = "secret";
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -65,7 +66,10 @@ public class UserService {
      * @throws RoleException    Исключение, если роль некорректна
      * @throws RequestException Исключение, если пользователь не найден
      */
-    public void giveRole(String email, String role) throws RoleException, RequestException {
+    public void giveRole(String email, String role, String key) throws RoleException, RequestException {
+        if(!secretKey.equals(key)) {
+            throw new RequestException("Неверный секретный ключ");
+        }
         if (!("chef".equals(role) || "manager".equals(role) || "customer".equals(role))) {
             throw new RoleException("Нет такой роли");
         }
@@ -120,13 +124,17 @@ public class UserService {
      * @throws JWTException  Исключение, если токен недействителен
      * @throws RoleException Исключение, если у пользователя нет прав на просмотр информации
      */
-    public String getInfo(String JWT, int usersID) throws JWTException, RoleException {
+    public String getInfo(String JWT, int usersID) throws JWTException, RoleException, RequestException {
         int jwtAfterParse = jwtService.checkJWTAndGiveUsersId(JWT);
         Optional<User> user = userRepository.findById(jwtAfterParse);
         if (!"manager".equals(user.get().getRole())) {
             throw new RoleException("Получение информации о пользователе возможно только для менеджера");
         }
-        return user.toString();
+        Optional<User> neededUser = userRepository.findById(usersID);
+        if(neededUser.isEmpty()) {
+            throw new RequestException("Нет пользователя с таким идентификатором");
+        }
+        return neededUser.get().toString();
     }
     /**
      * Проверка пароля на корректность.

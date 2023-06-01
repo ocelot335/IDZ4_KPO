@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.*;
 public class DishController {
     @Autowired
     private DishService dishService;
-    @Autowired
-    private DishRepository dishRepository;
     /**
      * Создание блюда.
      * @param request запрос на создание блюда.
